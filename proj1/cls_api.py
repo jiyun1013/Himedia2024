@@ -10,7 +10,7 @@ from mediapipe.tasks.python import vision
 # STEP 2: Create an ImageClassifier object. 추론기 만들기
 base_options = python.BaseOptions(model_asset_path='models\\efficientnet_lite0.tflite')
 options = vision.ImageClassifierOptions(
-    base_options=base_options, max_results=1)
+    base_options=base_options, max_results=3)
 classifier = vision.ImageClassifier.create_from_options(options)
 # 계속 로드하지 않도록함, 추론 객체는 한 번만 만들어두기
 # 결론: 모델 사용을 확실히 해두고, 서버 띄우기
@@ -47,14 +47,15 @@ async def create_upload_file(file: UploadFile):
     classification_result = classifier.classify(image)
 
     # STEP 5: Process the classification result. In this case, visualize it. 어떻게 보여줄지 
-    top_category = classification_result.classifications[0].categories[0]
-    result = f"{top_category.category_name} = ({top_category.score:.2f})"
+    count = 3
+    results = []
+    for i in range(count):
+        category = classification_result.classifications[0].categories[i]
+        results.append({"category":category.category_name, "score": category.score})
+    # result = f"{top_category.category_name} = ({top_category.score:.2f})"
 
 
-    return {"result": {
-        "category": top_category.category_name,
-        "score": top_category.score
-    }}
+    return {"result": results}
 
 
 #uvicorn cls_api:app
