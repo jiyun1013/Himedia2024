@@ -10,23 +10,20 @@ model = AutoModelForSequenceClassification.from_pretrained("nlp04/korean_sentime
 classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)
 
 @app.post("/upload/")
-async def upload_files(files: List[UploadFile] = File(...)):
-    results = []
-    for file in files:
-        # Ensure that the uploaded file is a text file
-        if file.filename.endswith(".txt"):
-            contents = await file.read()
-            text = contents.decode("utf-8")
-
-            # Perform sentiment analysis
-            result = classifier(text)
-
-            # Print the input text and the analysis result
-            print(text)
-            print(result[0])
-
-            results.append({"filename": file.filename, "sentiment": result})
-        else:
-            raise HTTPException(status_code=400, detail="Only text files (.txt) are allowed.")
-
-    return {"results": results}
+async def upload_file(file: UploadFile = File(...)):
+    # Ensure that the uploaded file is a text file
+    if file.filename.endswith(".txt"):
+        contents = await file.read()
+        text = contents.decode("utf-8")
+        
+        # Split the text into lines and analyze each line
+        lines = text.split("\n")
+        results = []
+        for line in lines:
+            # Perform sentiment analysis on each line
+            result = classifier(line)
+            results.append({"text": line, "sentiment": result})
+        
+        return {"results": results}
+    else:
+        raise HTTPException(status_code=400, detail="Only text files (.txt) are allowed.")
