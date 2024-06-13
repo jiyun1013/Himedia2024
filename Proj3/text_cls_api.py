@@ -12,11 +12,6 @@ async def text(text: str = Form()):
     #STEP 3. prepare input data
 # text = "작년 대비 10% 하락세."
 
-# STEP 4.
-# inputs = tokenizer(text, return_tensors="pt")
-# with torch.no_grad():
-#     logits = model(**inputs).logits
-
 #STEP 4. infrence
     result = classifier(text)
 
@@ -25,4 +20,5 @@ async def text(text: str = Form()):
 # 4-3. postprocssing  (logit -> data)
 
 #STEP 5. visulize
+    print(result)
     return {"result" : result}

@@ -1,6 +1,6 @@
 # STEP 1
-from transformers import AutoTokenizer, AutoModelForTokenClassification
-from transformers import pipeline
+from fastapi import FastAPI, Form
+from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
 # STEP 2
 tokenizer = AutoTokenizer.from_pretrained("Leo97/KoELECTRA-small-v3-modu-ner")
@@ -8,11 +8,15 @@ model = AutoModelForTokenClassification.from_pretrained("Leo97/KoELECTRA-small-v
 
 ner = pipeline("ner", model=model, tokenizer=tokenizer)
 
+app = FastAPI()
+
 # STEP 3
-example = "서울역으로 안내해줘."
+@app.post("/text/")
+async def text(text: str = Form()):
 
 #STEP 4
-ner_results = ner(example)
+    results = ner(text)
 
 # STEP 5
-print(ner_results)
+    print(results)
+    return "results"
